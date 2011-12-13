@@ -22,7 +22,8 @@ end
 function Getopt.showUsage(self)
 	print (self._usage)
 	if self._describe then
-		print("Options:")
+		print ("Options:")
+		local width = 12
 		for k,v in pairs (self._describe) do
 			local line = "  -"..k
 			for i,j in pairs(self._alias) do
@@ -30,8 +31,10 @@ function Getopt.showUsage(self)
 					line = line ..", --"..j
 				end
 			end
+			local w = width - #line
+			line = line..string.rep (" ", w)
 			-- TODO align columns
-			line = line .."   \t"..v
+			line = line .."   "..v
 			for i,j in pairs(self._demand) do
 				if k == j then
 					line = line .."  [required]"
