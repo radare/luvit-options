@@ -2,7 +2,8 @@
 local string = require ("string")
 
 local Options = {}
-Options._tab = {}
+Options.args = {} -- this is tab!
+
 Options._alias = {}
 Options._describe = {}
 Options._check = nil
@@ -18,18 +19,20 @@ function Options.usage (str)
 	return Options
 end
 
-
-function Options.showUsage()
+function Options.showUsage (options)
 	print (Options._usage)
 	if Options._describe then
 		print ("Options:")
-		local width = 12
-		for k,v in pairs (Options._describe) do
+		local width = 20
+		for k, v in pairs (Options._describe) do
 			local line = "  -"..k
-			for i,j in pairs (Options._alias) do
+			for i, j in pairs (Options._alias) do
 				if k == i then
 					line = line..", --"..j
 				end
+			end
+			if string.find (options, k..":", 1, true) then
+				line = line.." [arg]"
 			end
 			local w = width - #line
 			line = line..string.rep (" ", w)
@@ -37,10 +40,10 @@ function Options.showUsage()
 			line = line .."   "..v
 			for i, j in pairs (Options._demand) do
 				if k == j then
-					line = line.."  [required]"
+					line = line.."  *required*"
 				end
 			end
-			print(line)
+			print (line)
 		end
 	end
 end
@@ -60,13 +63,13 @@ end
 --      this behavior isn't implemented.
 function Options.parse (arg, options)
 	if #arg == 0 and Options._usage then
-		Options.showUsage()
-		process.exit(1)
+		Options.showUsage (options)
+		process.exit (1)
 	end
 
 	local ind = 0
 	local skip = 0
-	local tab = Options._tab
+	local tab = Options.args
 	tab["_"] = {}
 	tab["$0"] = arg[0]
 
@@ -82,13 +85,13 @@ function Options.parse (arg, options)
 		end
 		if string.sub (v, 1, 2) == "--" then
 			local bool
-			local boolk = ""
+			local boolk
 			if string.sub (v, 2,5) == "-no-" then
 				bool = false
 				boolk = string.sub (v,6)
 			else
-				boolk = string.sub (v,3)
 				bool = true
+				boolk = string.sub (v,3)
 			end
 			local x = string.find (v, "=", 1, true)
 			if x then tab[string.sub (v, 3, x-1)] = string.sub (v, x+1)
@@ -107,16 +110,16 @@ function Options.parse (arg, options)
 						tab[jopt] = string.sub (v, y+1)
 						y = l
 					else
-					if ch == ":" then
-						skip = 1
-						tab[jopt] = arg[k + 1]
-						if not tab[jopt] then
-							print ("Missing argument for "..v)
-							process.exit (1)
+						if ch == ":" then
+							skip = 1
+							tab[jopt] = arg[k + 1]
+							if not tab[jopt] then
+								print ("Missing argument for "..v)
+								process.exit (1)
+							end
+						else
+							tab[jopt] = true
 						end
-					else
-						tab[jopt] = true
-					end
 					end
 				else
 					tab[jopt] = true
@@ -137,10 +140,10 @@ function Options.parse (arg, options)
 		end
 	end
 	if Options._check and not Options._check (tab) then
-		print ("luvit-getop: check condition failed")
+		print ("luvit-getopt: check condition failed")
 		process.exit (1)
 	end
-	return tab
+	return Options
 end
 
 function Options.argv (opt)
@@ -154,10 +157,10 @@ end
 
 function Options.default (k, v)
 	if v then
-		Options._tab[k] = v
+		Options.args[k] = v
 	else
-		for i, j in pairs(k) do
-			Options._tab[i] = j
+		for i, j in pairs (k) do
+			Options.args[i] = j
 		end
 	end
 	return Options
