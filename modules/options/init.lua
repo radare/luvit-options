@@ -38,9 +38,11 @@ function Options.showUsage (options)
 			line = line..string.rep (" ", w)
 			-- TODO align columns
 			line = line .."   "..v
-			for i, j in pairs (Options._demand) do
-				if k == j then
-					line = line.."  *required*"
+			if Options._demand then
+				for i, j in pairs (Options._demand) do
+					if k == j then
+						line = line.."  *required*"
+					end
 				end
 			end
 			print (line)
@@ -62,7 +64,7 @@ end
 -- note POSIX demands the parser ends at the first non option
 --      this behavior isn't implemented.
 function Options.parse (arg, options)
-	if #arg == 0 and Options._usage then
+	if Options._demand and #arg == 0 and Options._usage then
 		Options.showUsage (options)
 		process.exit (1)
 	end
