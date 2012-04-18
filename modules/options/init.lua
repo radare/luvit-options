@@ -126,6 +126,7 @@ function Options.parse (arg, options)
 				else
 					tab[jopt] = true
 				end
+				tab[jopt] = tonumber(tab[jopt]) or tab[jopt]
 				y = y + 1
 			end
 		else
