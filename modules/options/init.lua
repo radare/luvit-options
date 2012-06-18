@@ -105,9 +105,9 @@ function Options.parse (arg, options)
 			local jopt
 			while (y <= l) do
 				jopt = string.sub (v, y, y)
-				local off = string.find (options, jopt, 1, true)
+				local off = string.find (v, jopt, 1, true)
 				if off then
-					local ch = string.sub (options, off+1, off+1)
+					local ch = string.sub (v, off+1, off+1)
 					if y < l then
 						tab[jopt] = string.sub (v, y+1)
 						y = l
