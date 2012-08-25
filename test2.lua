@@ -1,6 +1,6 @@
 #!/usr/bin/env luvit
 
-local opt = require ("options")
+local opt = require ("./init") -- require ("options") after installation
 	.usage ("Usage: ./test.lua [-hk] [-a arg] [-b arg]")
 	.default ("a", "patata")
 	.describe ("a", "set an argument to this flag")
